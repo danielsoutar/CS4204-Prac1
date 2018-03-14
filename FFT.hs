@@ -1,3 +1,4 @@
+module FFT where
 import Data.Complex
 import Samples
 import System.Environment
@@ -49,7 +50,7 @@ halve as = splitAt n' as
 --   samples :: Int -> Int -> [Complex Float]
 
 defsize = 1000 -- change this to get larger samples
-defseed = 1
+defseed = 0
 
 main = do args <- getArgs
           let arglen = length args

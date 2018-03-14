@@ -33,6 +33,10 @@ import Debug.Trace
 -- strategic parallel zipWith
 parZipWith strat (<>) as bs = zipWith (<>) as bs `using` parList strat
 
+-- strategic parallel zip
+parZip :: Strategy (a, b) -> [a] -> [b] -> [(a,b)]
+parZip strategy as bs = zip as bs `using` parList strategy
+
 -- non-strategic versions of standard patterns
 parzipwith :: NFData c => (a->b->c) -> [a] -> [b] -> [c]
 parzipwith = parZipWith rdeepseq
@@ -147,7 +151,7 @@ dc = dC rdeepseq
 dC :: Strategy b -> (a -> [a]) -> (a -> Bool) -> ([b] -> b) -> 
                     (a -> [b]) -> a -> b
 
-dC strat split threshold combine worker input =  combine results
+dC strat split threshold combine worker input = combine results
     where
       results = if threshold input then
                    worker input
@@ -155,9 +159,7 @@ dC strat split threshold combine worker input =  combine results
                    parMap strat (dC strat split threshold combine worker) 
                                 (split input)
 
-bsp :: (NFData l, NFData g) =>
-       [ l -> [g] -> (l,g) ] -> [ l ] -> [ g ] -> [ g ]
-
+bsp :: (NFData l, NFData g) => [ l -> [g] -> (l,g) ] -> [ l ] -> [ g ] -> [ g ]
 bsp = bSP rdeepseq
 
 bSP :: Strategy (l,g) -> [ l -> [g] -> (l,g) ] -> [ l ] -> [ g ] -> [ g ]
